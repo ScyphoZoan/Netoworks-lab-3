@@ -32,11 +32,47 @@ int main(int argc, char* argv[])
     // Start WSA (Windows)
 #ifdef WIN32
     WSADATA wsaData;
-    if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0) {
+    if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0)
+    {
         cerr << "ERROR: Failed to start WSA" << endl;
         return EXIT_FAILURE;
     }
 #endif
 
+    //set up socket
+    SOCKET ClientSocket;
+    ClientSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+    if (ClientSocket == INVALID_SOCKET)
+    {
+        WSACleanup();
+        cout << "ERROR: Failed to create a socket." << endl;
+        return EXIT_FAILURE;
+    }
+
+    //start connection
+    SOCKADDR_IN ServerAddr;
+    ServerAddr.sin_family = AF_INET;
+    ServerAddr.sin_port = htons(27000);
+    ServerAddr.sin_addr.s_addr = inet_addr("127.0.0.1");
+    if (connect(ClientSocket, (SOCKADDR*)&ServerAddr, sizeof(ServerAddr)) == SOCKET_ERROR)
+    {
+        closesocket(ClientSocket);
+        WSACleanup();
+        cout << "ERROR: Failed to connect to the server." << endl;
+        return EXIT_FAILURE;
+    }
+
+    //send/receive
+    char message[20] = "hello world2";
+    send(27000, message, 20, 0);
+
+    char receive[20] = {0};
+    recv(27000, receive, 20, 0);
+
+    cout << receive << endl;
+
+    //cleanup
+    close(ClientSocket);
+    WSACleanup();
     return 0;
 }
