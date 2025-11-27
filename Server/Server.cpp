@@ -81,13 +81,16 @@ int main(int argc, char* argv[])
     }
 
     //Send and receive data
-    char receive[20] = {0};
-    recv(27000, receive, 20, 0);
+    char recvBuff[256] = {};
 
-    char message[20] = "hello world";
-    send(27000, message, 20, 0);
+    size_t bytesRead = recv(ConnectionSocket, recvBuff, sizeof(recvBuff), 0);
+    string recvStr(recvBuff, bytesRead);
 
-    cout << receive << endl;
+    cout << recvStr << endl;
+
+    string message("Hello world");
+    send(ConnectionSocket, message.c_str(), (int)message.length(), 0);
+
 
     //cleanup
     close(ConnectionSocket);

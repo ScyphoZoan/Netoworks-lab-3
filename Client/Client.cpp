@@ -63,13 +63,14 @@ int main(int argc, char* argv[])
     }
 
     //send/receive
-    char message[20] = "hello world2";
-    send(27000, message, 20, 0);
+    string message("hello world2");
+    send(ClientSocket, message.c_str(), (int)message.length(), 0);
 
-    char receive[20] = {0};
-    recv(27000, receive, 20, 0);
+    char recvBuff[256] = {};
+    size_t bytesRead = recv(ClientSocket, recvBuff, sizeof(recvBuff), 0);
+    string recvStr(recvBuff, bytesRead);
 
-    cout << receive << endl;
+    cout << recvStr << endl;
 
     //cleanup
     close(ClientSocket);
